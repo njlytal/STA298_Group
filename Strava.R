@@ -43,7 +43,7 @@ dev.off()
 
 # concatenate all the data
 run.all <- do.call("rbind",run.list5)
-pdf(file="Running_Occurcence_with_Time")
+pdf(file="Running_Occurcence_with_Time.pdf")
 hist(hours(run.all$daytime),main="Running Occurrence During the Day",xlab="Hour")
 plot(months(run.all$daytime),main="Running Occurrence During the Year",xlab="Month")
 plot(weekdays(run.all$daytime),main="Running Occurrence During the Weed",xlab="Week Days")
