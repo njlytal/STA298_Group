@@ -68,7 +68,9 @@ write.csv(dat, "all_data.csv")
 # Convert some data types from character to numeric
 dat[,6:15] <- sapply(dat[,6:15], as.numeric)
 
-
+# Average speed as an additional variable
+dat[,31] = dat$distance/dat$moving_time
+colnames(dat)[31] = "avg_speed"
 
 
 
@@ -79,6 +81,44 @@ dat.swim <- dat[dat$type == "Swim" ,]   # Swimming
 
 # ********************* PLOTS *************************
 
+# Sorting by country
+library("lattice")
+
+# Future task: Look at individuals' performances, not just overall
+# runs for countries
+
+
+dat.mod = dat.run[which(dat.run$distance < 70000 & dat.run$avg_speed < 12 & dat.run$max_speed < 20),]
+
+xyplot(avg_speed ~ distance | country, data = dat.mod, xlab = "Distance (m)",
+       ylab = "Avg. Speed (m/s)")
+
+xyplot(max_speed ~ distance | country, data = dat.mod, xlab = "Distance (m)",
+       ylab = "Max Speed (m/s)")
+
+fili = dat.run[which(dat.run$country == "Philippines"),] 
+
+
+
+
+
+# This person made a typo in his own country! # 367!
+noreg = dat.run[which(dat.run$country == "Noreg"),]
+
+all.country = unique(dat$country)
+
+avg.distance = lapply(length(all.country),
+                      function(x) mean(dat$country == all.country[x]))
+
+# Smooth Scatter of USA run times (avg_speed v distance)
+test1 = dat.run[which(dat.run$country == "United States" & dat.run$distance < 75000 & dat.run$avg_speed < 15),]
+smoothScatter(x = test1$distance, y = test1$avg_speed)
+
+# Smooth Scatter of USA run times (max_speed v distance)
+test2 = dat.run[which(dat.run$country == "United States" & dat.run$distance < 75000 & dat.run$max_speed < 20),]
+smoothScatter(x = test2$distance, y = test2$max_speed)
+
+test = dat[which(dat$country == ""),]
 # World Distribution of all events: From Junli's code
 
 library("maps")
