@@ -24,6 +24,34 @@ for(individual in 1:length(dats)) {
 # Remove duplicated entries (ind refers to "individual")
 dats <- lapply(dats, function(ind) ind[!duplicated(ind), ])
 
+# === NEW ADDITIONS ===
+# For reference: dats[[1]][1,] is the first row for the first person
+
+# *** DEMOGRAPHIC INFO ***
+
+# Directory will vary depending on user
+demo <- read.csv("~/Desktop/STA 298 findings/anonAthleteInfo_1000.csv")
+demo.orig <- demo # Unmodified copy of original demo data
+# demo <- demo.orig # Restore to original data
+
+# Friend & Follower columns dropped (they only have NA entries anyway)
+# Date & Measurement preferences dropped (probably insignificant?)
+demo <- demo[,-c(6,7)]
+
+# Change created_at & updated_at to be Date objects
+demo[,7] <- as.Date(demo[,7])
+demo[,8] <- as.Date(demo[,8])
+
+# NOTE: Consider dropping date & measurement preferences as unimportant
+
+# Merge demographic data with raw data
+# Whenever id = X, put in column X of demographic data
+for(i in 1:1000){
+    dats[[i]][,19:30] <- demo[i,]
+}
+
+# === END NEW ADDITIONS ===
+
 # Combine data frames
 dat <- do.call(rbind, dats)  # create data frame
 rm(dats)                     # remove list
@@ -39,22 +67,6 @@ write.csv(dat, "all_data.csv")
 # *** DATA CLEANING ***
 # Convert some data types from character to numeric
 dat[,6:15] <- sapply(dat[,6:15], as.numeric)
-
-# *** DEMOGRAPHIC INFO ***
-
-# Directory will vary depending on user
-demo <- read.csv("~/Desktop/STA 298 findings/anonAthleteInfo_1000.csv")
-demo.orig <- demo # Unmodified copy of original demo data
-# demo <- demo.orig # Restore to original data
-
-# Friend & Follower columns dropped (they only have NA entries anyway)
-demo <- demo[,-c(6,7)]
-
-# Change created_at & updated_at to be Date objects
-demo[,7] <- as.Date(demo[,7])
-demo[,8] <- as.Date(demo[,8])
-
-# NOTE: Consider dropping date & measurement preferences as unimportant
 
 
 
