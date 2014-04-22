@@ -23,15 +23,15 @@ racediff <- runrace$elapsed_time - runrace$moving_time
 traindiff <- runtrain$elapsed_time - runtrain$moving_time
 
 #plot elapsed time vs moving time
-qplot(runrace$moving_time,runrace$elapsed_time,main="Races runs",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
-qplot(runtrain$moving_time,runtrain$elapsed_time,main="Training runs (all)",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
+qplot(runrace$moving_time/3600,runrace$elapsed_time/3600,main="Races runs",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
+qplot(runtrain$moving_time/3600,runtrain$elapsed_time/3600,main="Training runs (all)",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
 
-p1 <- qplot(rundata[which(is.na(rundata$workout_type)),]$moving_time,rundata[which(is.na(rundata$workout_type)),]$elapsed_time,main="Training runs (NA)",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
-p2 <- qplot(runtrain[which(runtrain$workout_type=="0"),]$moving_time,runtrain[which(runtrain$workout_type=="0"),]$elapsed_time,main="Training runs (Default)",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
-p3 <- qplot(runtrain[which(runtrain$workout_type=="2"),]$moving_time,runtrain[which(runtrain$workout_type=="2"),]$elapsed_time,main="Training runs (Long run)",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
-p4 <- qplot(runtrain[which(runtrain$workout_type=="3"),]$moving_time,runtrain[which(runtrain$workout_type=="3"),]$elapsed_time,main="Training runs (Intervals)",xlab="Moving time",ylab="Elapsed time",xlim=c(0,89880),ylim=c(0,90000))
+p1 <- qplot(rundata[which(is.na(rundata$workout_type)),]$moving_time/3600,rundata[which(is.na(rundata$workout_type)),]$elapsed_time/3600,main="Training runs (NA)",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
+p2 <- qplot(runtrain[which(runtrain$workout_type=="0"),]$moving_time/3600,runtrain[which(runtrain$workout_type=="0"),]$elapsed_time/3600,main="Training runs (Default)",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
+p3 <- qplot(runtrain[which(runtrain$workout_type=="2"),]$moving_time/3600,runtrain[which(runtrain$workout_type=="2"),]$elapsed_time/3600,main="Training runs (Long run)",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
+p4 <- qplot(runtrain[which(runtrain$workout_type=="3"),]$moving_time/3600,runtrain[which(runtrain$workout_type=="3"),]$elapsed_time/3600,main="Training runs (Intervals)",xlab="Moving time (hours)",ylab="Elapsed time (hours)",xlim=c(0,89880/3600),ylim=c(0,90000/3600))
 grid.arrange(p1,p2,p3,p4,ncol=2)
 
 #histogram of difference between elapsed and moving times, first bin removed to adjust scale
-qplot(racediff,gemom="histogram",ylim=c(0,100),xlab="Elapsed time-moving time",main="Race runs")
-qplot(traindiff,gemom="histogram",ylim=c(0,1200),xlab="Elapsed time-moving time",main="Training runs")
+qplot(racediff/3600,geom="histogram",ylim=c(0,100),xlab="Elapsed time-moving time (hours)",main="Race runs")
+qplot(traindiff/3600,geom="histogram",ylim=c(0,1200),xlab="Elapsed time-moving time (hours)",main="Training runs")
