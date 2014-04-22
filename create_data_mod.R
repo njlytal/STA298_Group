@@ -31,6 +31,7 @@ dats <- lapply(dats, function(ind) ind[!duplicated(ind), ])
 
 # Directory will vary depending on user
 demo <- read.csv("~/Desktop/STA 298 findings/anonAthleteInfo_1000.csv")
+load('~/Desktop/demo.RData')
 demo.orig <- demo # Unmodified copy of original demo data
 # demo <- demo.orig # Restore to original data
 
