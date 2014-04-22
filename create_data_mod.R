@@ -79,6 +79,69 @@ dat.run <- dat[dat$type == "Run" ,]     # Running
 dat.ride <- dat[dat$type == "Ride" ,]   # Bicycling
 dat.swim <- dat[dat$type == "Swim" ,]   # Swimming
 
+unique(dat$type) # Different types of activities
+
+races = dat.run[dat.run$workout_type == 1 ,]
+
+# *************** SAME RACE DATA **********************
+
+# Goal: determine if some of the racers in our data ran in the
+# same races
+# Procedure: Narrow down the city, date, and (with some leeway)
+# distance of runs to see if there are any duplicates
+
+# Just city and date
+
+# Find duplicated entries x
+
+# Duplicate cities and start times (but not at same time!)
+dupli.city.time <- duplicated(dat.run[, 5]) & duplicated(dat.run[, 20])
+
+# All cases where start time is duped
+test1 <- duplicated(dat.run[, 5])
+# All cases where start time AND city are duped
+test2 <- duplicated(dat.run[, 5]) & duplicated(dat.run[, 20])
+# These are DIFFERENT at 317941, 359656 (only present in test1)
+test3 <- duplicated(dat.run[, c(5,20)])
+
+
+dat.run[359656,]
+
+dupli.city.time <- dat.run[which(duplicated(dat.run[, c(5,20)]) == TRUE), ]
+# Of these duplicate cities & times, which have DIFFERENT names?
+dct.names <- dupli.city.time[which(duplicated(dupli.city.time[, 19]) == FALSE), ]
+
+# Of this reduced data set, how many entries have duplicate cities?
+dct.spec <- dct.names[which(duplicated(dct.names[, 20])==TRUE), ]
+sort(unique(dct.spec[,5]))
+# Number of unique start times is equal to size of data set, even if just
+# looking at dates.
+# PROBABLY not anybody doing the same race at any given time.
+
+dupli.city.time <- dat.run[which(duplicated(dat.run[, 5]) == TRUE), ]
+
+dupli.list <- lapply(dat.run, function(x) x[which(duplicated(x[,c(5,20)])==TRUE), ])
+
+test = dat.run[which(dat.run$start_date_local == "2012-07-31 17:58:13") ,]
+
+# Of 399758 runs, 395815 unique dates exist (this INCLUDES times!)
+
+# Removes time, just has dates
+race.days = substring(dat.run$start_date_local,1,10) 
+
+# 3003 unique days exist
+unique.days = unique(race.days)
+
+# 665 unique cities
+unique.city = unique(dat.run$city)
+
+# Chops off 14 absurd distances
+real.dist = dat.run$distance[which(dat.run$distance < 300000)]
+plot(density(real.dist))
+
+
+
+
 # ********************* PLOTS *************************
 
 # Sorting by country
@@ -91,18 +154,18 @@ library("lattice")
 dat.mod = dat.run[which(dat.run$distance < 70000 & dat.run$avg_speed < 12 & dat.run$max_speed < 20),]
 
 xyplot(avg_speed ~ distance | country, data = dat.mod, xlab = "Distance (m)",
-       ylab = "Avg. Speed (m/s)")
+       ylab = "Avg. Speed (m/s)", main = "Avg. Speed & Distance by Country (Run Only)")
 
 xyplot(max_speed ~ distance | country, data = dat.mod, xlab = "Distance (m)",
-       ylab = "Max Speed (m/s)")
+       ylab = "Max Speed (m/s)", main = "Max Speed & Distance by Country (Run Only)")
 
 fili = dat.run[which(dat.run$country == "Philippines"),] 
 
+belg = dat.run[which(dat.run$country == "België"),]  
 
 
-
-
-# This person made a typo in his own country! # 367!
+# This person used a specific regional variant of Norway (NOT a typo!)
+# Person #367 is the only one to record country as "Noreg"
 noreg = dat.run[which(dat.run$country == "Noreg"),]
 
 all.country = unique(dat$country)
