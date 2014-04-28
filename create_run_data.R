@@ -88,5 +88,6 @@ dat.run <- dat.run[dat.run$moving_time < 86400, ] # Moving time under 1 day
 dat.run[which(dat.run$avg_hr > 200 | dat.run$avg_hr < 50), 13] = NA
 dat.run[which(dat.run$max_hr > 200 | dat.run$max_hr < 50), 14] = NA
 
+write.csv(dat.run, "run_data.csv")
 # Working on a way to isolate duplicates not already covered earlier
 # (i.e. Same time, place, and person, but different other variables like description)
