@@ -30,7 +30,7 @@ dats <- lapply(dats, function(ind) ind[!duplicated(ind), ])
 # *** DEMOGRAPHIC INFO ***
 
 # Directory will vary depending on user
-demo <- read.csv("~/Desktop/STA 298 findings/anonAthleteInfo_1000.csv")
+demo <- read.csv("anonAthleteInfo_1000.csv")
 demo.orig <- demo # Unmodified copy of original demo data
 # demo <- demo.orig # Restore to original data
 
@@ -77,10 +77,10 @@ rm(dat)
 
 # From here, we specify limitations on the data
 # Please add any additional limitations as they are discovered
-dat.run = dat.run.orig
+dat.run -> dat.run.orig
 
 dat.run <- dat.run[dat.run$avg_speed < 12, ] # 12 m/s is faster than world record 100m 
-dat.run <- dat.run[dat.run$moving_time < dat.run$elapsed.time, ]
+dat.run <- dat.run[dat.run$moving_time < dat.run$elapsed_time, ]
 dat.run <- dat.run[dat.run$distance < 60000, ] # Marathon = 50k, with extra buffer to be sure
 dat.run <- dat.run[dat.run$moving_time < 86400, ] # Moving time under 1 day
 
