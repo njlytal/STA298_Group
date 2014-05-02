@@ -81,8 +81,11 @@ dat.run -> dat.run.orig
 
 dat.run <- dat.run[dat.run$avg_speed < 12, ] # 12 m/s is faster than world record 100m 
 dat.run <- dat.run[dat.run$moving_time < dat.run$elapsed_time, ]
+dat.run <- dat.run[dat.run$moving_time > (dat.run$elapsed_time/4), ]
+
 dat.run <- dat.run[dat.run$distance < 60000, ] # Marathon = 50k, with extra buffer to be sure
 dat.run <- dat.run[dat.run$moving_time < 86400, ] # Moving time under 1 day
+dat.run <- dat.run[dat.run$elapsed_time < 86400, ] # Moving time under 1 day
 
 # Turn heart rate to NA if unrealistic
 dat.run[which(dat.run$avg_hr > 200 | dat.run$avg_hr < 50), 13] = NA
