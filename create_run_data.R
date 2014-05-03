@@ -84,8 +84,15 @@ dat.run <- dat.run[dat.run$moving_time < dat.run$elapsed_time, ]
 dat.run <- dat.run[dat.run$moving_time > (dat.run$elapsed_time/4), ]
 
 dat.run <- dat.run[dat.run$distance < 60000, ] # Marathon = 50k, with extra buffer to be sure
+<<<<<<< HEAD
 dat.run <- dat.run[dat.run$moving_time < 86400, ] # Moving time under 1 day
 dat.run <- dat.run[dat.run$elapsed_time < 86400, ] # Moving time under 1 day
+=======
+dat.run <- dat.run[dat.run$elapsed_time < 86400, ] # Moving time under 1 day
+dat.run <- dat.run[complete.cases(dat.run[8:9]),] #remove entries with NA for elapsed and moving time
+dat.run <- dat.run[dat.run$max_speed < 12, ]#Usain Bolt world record speed 12.42m/s
+dat.run <- dat.run[dat.run$avg_speed < 5.5, ]#4:46 per mile pace marathon world record ~5.6m/s
+>>>>>>> FETCH_HEAD
 
 # Turn heart rate to NA if unrealistic
 dat.run[which(dat.run$avg_hr > 200 | dat.run$avg_hr < 50), 13] = NA
