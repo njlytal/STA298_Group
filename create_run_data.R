@@ -4,7 +4,8 @@
 # To run this:
 # (1) install jsonlite
 # (2) unzip the Strava data to the point where you have raw .json files
-# (3) place demographic csv file in same directory
+# (3) place demographic csv file "anonAthleteInfo_1000.csv" (Week 2 handout)
+#     in same directory
 # (4) point the following function to that directory
 # END RESULT: Run Data + Demographic Data, UNCLEANED
 setwd("~/Desktop/StravaSample1")

@@ -15,6 +15,7 @@ dat.run <- dat.run[dat.run$elapsed_time < 86400, ] # Keep moving time under 1 da
 dat.run <- dat.run[complete.cases(dat.run[8:9]),] #remove entries with NA for elapsed and moving time
 dat.run <- dat.run[dat.run$max_speed < 12, ]#Usain Bolt world record speed 12.42m/s
 dat.run <- dat.run[dat.run$avg_speed < 5.5, ]#4:46 per mile pace marathon world record ~5.6m/s
+dat.run$avg_cadences = NULL # Removes this variable, which refers to cycling RPM
 
 # Turn heart rate to NA if unrealistic
 dat.run[which(dat.run$avg_hr > 200 | dat.run$avg_hr < 50), 13] = NA
