@@ -3,6 +3,8 @@
 
 # From here, we specify limitations on the data
 # Please add any additional limitations as they are discovered
+
+#dat.run <- read.csv(file = "run_data.csv", header=T) #line to read in the run_data.csv to avoid repeated processing
 dat.run -> dat.run.orig
 
 dat.run <- dat.run[dat.run$avg_speed < 12, ] # 12 m/s is faster than world record 100m
@@ -22,6 +24,7 @@ dat.run[which(dat.run$max_hr > 200 | dat.run$max_hr < 50), 14] = NA
 
 dat.run <- dat.run[complete.cases(dat.run[8:9]),] #remove entries with NA for elapsed and moving time
 
-#write.csv(dat.run, "run_data.csv")
+#write.csv(dat.run, "run_data.csv") #write out processed data for later handling
+
 # Working on a way to isolate duplicates not already covered earlier
 # (i.e. Same time, place, and person, but different other variables like description)
