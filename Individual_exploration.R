@@ -13,25 +13,29 @@ mins <- ddply(dat.run, "id", numcolwise(min))
 p1 <- qplot(means$moving_time/60,means$elapsed_time/60, xlab = "Moving time (min)", ylab = "Elapsed time (min)", main = "Individual means")
 p2 <- qplot(means$distance,means$moving_time/60, xlab = "Distance (meters)",ylab = "Moving time (min)", main = "Individual means")
 p3 <- qplot(means$distance,means$elapsed_time/60, xlab = "Distance (meters)",ylab = "Elapsed time (min)", main = "Individual means")
-grid.arrange(p1,p2,p3, ncol=2)
+p4 <- qplot(means$distance,means$avg_speed, xlab = "Distance (meters)",ylab = "Speed (m/s)", main = "Individual means")
+grid.arrange(p1,p2,p3,p4, ncol=2)
 
 #plot some data for standard deviations
 p1 <- qplot(sds$moving_time/60,sds$elapsed_time/60, xlab = "Moving time (min)", ylab = "Elapsed time (min)", main = "Individual sds")
 p2 <- qplot(sds$distance,sds$moving_time/60, xlab = "Distance (meters)",ylab = "Moving time (min)", main = "Individual sds")
 p3 <- qplot(sds$distance,sds$elapsed_time/60, xlab = "Distance (meters)",ylab = "Elapsed time (min)", main = "Individual sds")
-grid.arrange(p1,p2,p3, ncol=2)
+p4 <- qplot(sds$distance,sds$avg_speed, xlab = "Distance (meters)",ylab = "Speed (m/s)", main = "Individual sds")
+grid.arrange(p1,p2,p3,p4, ncol=2)
 
 #plot some data for maximum values
 p1 <- qplot(maxs$moving_time/60,maxs$elapsed_time/60, xlab = "Moving time (min)", ylab = "Elapsed time (min)", main = "Individual maxs")
 p2 <- qplot(maxs$distance,maxs$moving_time/60, xlab = "Distance (meters)",ylab = "Moving time (min)", main = "Individual maxs")
 p3 <- qplot(maxs$distance,maxs$elapsed_time/60, xlab = "Distance (meters)",ylab = "Elapsed time (min)", main = "Individual maxs")
-grid.arrange(p1,p2,p3, ncol=2)
+p4 <- qplot(maxs$distance,maxs$avg_speed, xlab = "Distance (meters)",ylab = "Speed (m/s)", main = "Individual maxs")
+grid.arrange(p1,p2,p3,p4, ncol=2)
 
 #plot some data for minimum values
 p1 <- qplot(mins$moving_time/60,mins$elapsed_time/60, xlab = "Moving time (min)", ylab = "Elapsed time (min)", main = "Individual mins")
 p2 <- qplot(mins$distance,mins$moving_time/60, xlab = "Distance (meters)",ylab = "Moving time (min)", main = "Individual mins")
 p3 <- qplot(mins$distance,mins$elapsed_time/60, xlab = "Distance (meters)",ylab = "Elapsed time (min)", main = "Individual mins")
-grid.arrange(p1,p2,p3, ncol=2)
+p4 <- qplot(mins$distance,mins$avg_speed, xlab = "Distance (meters)",ylab = "Speed (m/s)", main = "Individual mins")
+grid.arrange(p1,p2,p3,p4, ncol=2)
 
 #Look at distance
 p1 <- qplot(means$distance, main = "Means")
