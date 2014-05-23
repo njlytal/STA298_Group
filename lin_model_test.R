@@ -56,7 +56,7 @@ lm.combo = function(all.data, id)
     compare = data.frame(y, y.est, abs(y-y.est), 100*abs(y-y.est)/y)
     names(compare) = c("Actual", "Estimate", "Abs. Diff.", "% Diff.")
     
-    out = list(samp.mod, coeffs, compare)
+    out = list(samp.mod, beta, compare)
     out
 }
 
@@ -97,7 +97,7 @@ lm.combo.hr = function(all.data, id)
     compare = data.frame(y, y.est, abs(y-y.est), 100*abs(y-y.est)/y)
     names(compare) = c("Actual", "Estimate", "Abs. Diff.", "% Diff.")
     
-    out = list(samp.mod, coeffs, compare)
+    out = list(samp.mod, beta, compare)
     out
 }
 
@@ -198,3 +198,6 @@ dat.run = as.matrix(dat.run)
 mean(dat.run$avg_hr, na.rm = TRUE) # Overall AVG HR
 
 mean(dat.run$max_hr, na.rm = TRUE) # Overall MAX HR
+
+# TOTAL NUMBER OF RACES
+sum(dat.run$workout_type == 1, na.rm = TRUE) # only 1980
