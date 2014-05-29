@@ -8,7 +8,7 @@
 #     in same directory
 # (4) point the following function to that directory
 # END RESULT: Run Data + Demographic Data, UNCLEANED
-setwd("~/Desktop/StravaSample1")
+setwd("~/Desktop/StravaSample1") # For the original data
 library(jsonlite)
 
 ### Parse JSON files

@@ -201,3 +201,4 @@ mean(dat.run$max_hr, na.rm = TRUE) # Overall MAX HR
 
 # TOTAL NUMBER OF RACES
 sum(dat.run$workout_type == 1, na.rm = TRUE) # only 1980
+
