@@ -37,4 +37,5 @@ am.test2 <- amelia(dat.run,
                             "date_preference",
                             "measurement_preference"))
 
-
+save(am.test2, file = "amelia5-2.RData")
+write.amelia(obj=am.test2, file.stem = "am5-2imp", format = "csv")
