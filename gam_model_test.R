@@ -1,5 +1,5 @@
 # Strava Data w/ gam()
-
+library(gam)
 
 test = gam(dat.run$moving_time ~ dat.run$elapsed_time + dat.run$distance +
              dat.run$elev_gain + dat.run$max_speed + dat.run$avg_speed)
