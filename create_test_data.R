@@ -37,16 +37,12 @@ dats.2 <- lapply(2:4, function(i)
 # Output: list of data frames
 filenames = list.files()
 
-# TAKES ABOUT 16:40.00 for each 100
+# TAKES ABOUT 16-17 min. for each 100
 
-# Complete: 1-100
-dats <- lapply(101:200, function(i)
+# Complete: 1-800
+dats <- lapply(801:1001, function(i)
   fromJSON(txt = filenames[i]))
 
-length(dats[[3]][,1])
-
-dats <- lapply(1:1000, function(i)
-  fromJSON(txt = filenames[i]))
 
 # WARNING! There are DIFFERENT VARIABLES in the Test Data!
 # Common ones include: names, distance, moving_time, elapsed_time,
@@ -144,3 +140,5 @@ rm(dat)
 # Convert all data columns to numeric form
 dat.run[,1:12] <- sapply(dat.run[,1:12], as.numeric)
 # This may introduce NAs by coercion, but this is only for "NA" to begin with.
+# Only did so within first 100
+
