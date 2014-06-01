@@ -23,15 +23,10 @@
 #     in same directory
 # (4) point the following function to that directory
 # END RESULT: Run Data + Demographic Data, UNCLEANED
+
+# Set directory to location of json files
 setwd("~/Desktop/StravaTest") # For the test data for final project
 library(jsonlite)
-
-# Training Data, for comparison
-setwd("~/Desktop/StravaSample1") 
-dats.2 <- lapply(2:4, function(i)
-  fromJSON(txt = paste(i, ".json", sep = "")))
-
-
 
 ### Parse JSON files
 # Output: list of data frames
@@ -39,8 +34,8 @@ filenames = list.files()
 
 # TAKES ABOUT 16-17 min. for each 100
 
-# Complete: 1-800
-dats <- lapply(801:1001, function(i)
+
+dats <- lapply(1:1000, function(i)
   fromJSON(txt = filenames[i]))
 
 
@@ -60,15 +55,14 @@ dats <- lapply(801:1001, function(i)
 # Also creates a "dummy" variable that detects the presence of a heart rate
 # variable, which is NOT present in all .json files.
 
-# 
+# List of variables to keep (for equal number of columns)
 
 keep.list = c("moving_time", "elapsed_time", "distance", "max_speed",
               "average_speed", "total_elevation_gain", "id",
               "eventID", "raceID", "HR", "average_heartrate", "max_heartrate",
-              "type")
+              "type", "start_date_local")
 
 # Takes about 33 sec. for 100 files
-start.2 = proc.time()
   for(individual in 1:length(dats)) {
 
     # Search for presence of heart rate data (HR indicates this)
@@ -107,7 +101,6 @@ start.2 = proc.time()
     dats[[individual]] = dats[[individual]][,-cut]
     
   }
-time.2 = proc.time() - start.2
 
 
 
@@ -142,3 +135,6 @@ dat.run[,1:12] <- sapply(dat.run[,1:12], as.numeric)
 # This may introduce NAs by coercion, but this is only for "NA" to begin with.
 # Only did so within first 100
 
+# Repeat for all groups
+
+dat.run.test = dat.run # Establish the name as dat.run.test to differentiate from training data
