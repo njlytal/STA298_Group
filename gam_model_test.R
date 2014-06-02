@@ -6,7 +6,7 @@ test = gam(dat.run$moving_time ~ dat.run$elapsed_time + dat.run$distance +
 
 
 # modified from lin_model_test.R (not much changed yet)
-gam.combo = function(all.data, id)
+gam.combo = function(all.data)
 {
   data = all.data[which(all.data$id == id),]
   samp.mod = gam(data$moving_time ~ data$elapsed_time + data$distance +
@@ -27,6 +27,7 @@ gam.combo = function(all.data, id)
   err = y-y.est
   n = nrow(y.est)
   RMSE = sqrt(sum(err*err)/n)
+
   
   compare = data.frame(y, y.est, RMSE)
   names(compare) = c("Actual", "Estimate", "RMSE")
@@ -35,4 +36,4 @@ gam.combo = function(all.data, id)
   out
 }
 
-gam.combo(dat.run.train, 1)
+test = sapply(1:100, function(x) gam.combo(dat.run.train, x))
