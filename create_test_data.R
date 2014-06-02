@@ -25,7 +25,7 @@
 # END RESULT: Run Data + Demographic Data, UNCLEANED
 
 # Set directory to location of json files
-setwd("~/Desktop/StravaTest") # For the test data for final project
+setwd("/Volumes/DATA2/users/trhowell/tmp/sta298/testdata/") # For the test data for final project
 library(jsonlite)
 
 ### Parse JSON files
@@ -117,7 +117,7 @@ gc()                         # clean up memory
 
 
 # Write file for later access
-write.csv(dat, "~/Desktop/all_data.csv")
+write.csv(dat, "all_data.csv")
 
 # ================== FINAL CONVERSIONS ================== #
 # Slight modifications to isolate run + demo data
@@ -138,3 +138,5 @@ dat.run[,1:12] <- sapply(dat.run[,1:12], as.numeric)
 # Repeat for all groups
 
 dat.run.test = dat.run # Establish the name as dat.run.test to differentiate from training data
+
+write.csv(dat.run.test,"test.run.data.csv") #write out processed data
