@@ -117,11 +117,7 @@ gc()                         # clean up memory
 
 
 # Write file for later access
-<<<<<<< HEAD
-write.csv(dat.run, "~/Desktop/all_data.csv")
-=======
 write.csv(dat, "all_data.csv")
->>>>>>> FETCH_HEAD
 
 # ================== FINAL CONVERSIONS ================== #
 # Slight modifications to isolate run + demo data
