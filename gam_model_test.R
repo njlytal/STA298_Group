@@ -6,9 +6,9 @@ test = gam(dat.run$moving_time ~ dat.run$elapsed_time + dat.run$distance +
 
 
 # modified from lin_model_test.R (not much changed yet)
-gam.combo = function(all.data)
+gam.combo = function(data)
 {
-  data = all.data[which(all.data$id == id),]
+  browser()
   samp.mod = gam(data$moving_time ~ data$elapsed_time + data$distance +
                   data$elev_gain + data$max_speed + data$avg_speed)
   
@@ -32,8 +32,13 @@ gam.combo = function(all.data)
   compare = data.frame(y, y.est, RMSE)
   names(compare) = c("Actual", "Estimate", "RMSE")
   
-  out = list(samp.mod, beta, compare)
-  out
+  #out = list(samp.mod, beta, compare)
+  compare
 }
 
-test = sapply(1:100, function(x) gam.combo(dat.run.train, x))
+test = gam.combo(dat.run.train)
+
+
+summary(dat.run.train[,10])
+
+dat.run.train = dat.run.train[-which(is.na(dat.run.train[,10])),]

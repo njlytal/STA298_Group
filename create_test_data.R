@@ -35,7 +35,7 @@ filenames = list.files()
 # TAKES ABOUT 16-17 min. for each 100
 
 
-dats <- lapply(1:1000, function(i)
+dats <- lapply(1001:1001, function(i)
   fromJSON(txt = filenames[i]))
 
 
@@ -117,7 +117,7 @@ gc()                         # clean up memory
 
 
 # Write file for later access
-write.csv(dat, "~/Desktop/all_data.csv")
+write.csv(dat.run, "~/Desktop/all_data.csv")
 
 # ================== FINAL CONVERSIONS ================== #
 # Slight modifications to isolate run + demo data

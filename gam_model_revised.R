@@ -31,14 +31,10 @@ gam.combo.no.hr = function(data, dataline)
 
 gam.combo.hr = function(data, dataline)
 {
+  browser()
   samp.mod = gam(data$elapsed_time ~ data$moving_time + data$distance +
                    data$elev_gain + data$max_speed + data$avg_speed +
                    data$avg_hr + data$max_hr)
-  
-  # Residuals info - Can uncomment for use on single runners
-  # plot(samp.mod[[2]])
-  # qqnorm(samp.mod[[2]])
-  # qqline(samp.mod[[2]])
   
   
   #y = data$moving_time

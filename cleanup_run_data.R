@@ -4,6 +4,12 @@
 # From here, we specify limitations on the data
 # Please add any additional limitations as they are discovered
 
+# For cleaning all_data (test data)
+# dat.run <- all_data[all_data$type == "Run", ]
+# dat.run$type <- NULL
+# rm(all_data)
+# dat.run$row.names <- NULL
+
 #dat.run <- read.csv(file = "run_data.csv", header=T) #line to read in the run_data.csv to avoid repeated processing
 dat.run -> dat.run.orig
 
