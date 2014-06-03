@@ -31,6 +31,7 @@ gam.combo.no.hr = function(data, dataline)
 
 gam.combo.hr = function(data, dataline)
 {
+  # browser()
   samp.mod = gam(data$elapsed_time ~ data$distance + data$moving_time +
                    data$elev_gain + data$avg_speed + data$max_speed + 
                    data$avg_hr + data$max_hr)
@@ -40,9 +41,7 @@ gam.combo.hr = function(data, dataline)
   beta = t(t(as.numeric(samp.mod$coefficients)))
   #X = as.matrix(data.frame(rep(1,nrow(all.data)), data$moving_time, data$distance,
   #                         data$elev_gain, data$max_speed, data$avg_speed))
-  X = t(as.matrix(c(1,dataline$distance, dataline$moving_time,
-                dataline$elev_gain, dataline$avg_speed, dataline$max_speed,
-                dataline$avg_hr, dataline$max_hr)))
+  X = t(as.matrix(c(1,dataline)))
   # Remove elapsed_time and start_local_date
   y.est = X%*%beta # Estimates elapsed time using that particular race's data
   

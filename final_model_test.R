@@ -65,14 +65,6 @@ imp5 = am.test2$imputations[[5]]
 avg_hr = numeric(nrow(imp1))
 max_hr = numeric(nrow(imp1))
 
-for(i in 1:nrow(imp1))
-{
-  avg_hr[i] = mean(c(imp1[i,8], imp2[i,8],
-                     imp3[i,8], imp4[i,8], imp5[i,8]))
-  max_hr[i] = mean(c(imp1[i,9], imp2[i,9],
-                     imp3[i,9], imp4[i,9], imp5[i,9]))
-}
-
 avg.hr.combo = cbind(imp1[,8],imp2[,8], imp3[,8], imp4[,8], imp5[,8])
 avg_hr = sapply(1:nrow(imp1), function(x) mean(avg.hr.combo[x,]))
 
@@ -85,6 +77,10 @@ dat.run.test$average_heartrate <- avg_hr
 dat.run.test$max_heartrate <- max_hr
 rm(avg.hr.combo, avg_hr, max.hr.combo, max_hr)
 rm(imp1, imp2, imp3, imp4, imp5)
+
+# EXTRA IF PREDICTED LINES WERE IMPUTED TOO
+dat.predict = dat.run.test[625692:631058,]
+
 
 # Now dat.run.test has all the test data with imputed values
 # Reduces test the following variables:
@@ -124,7 +120,7 @@ load("~/Desktop/STA 298 findings/all_train_test_amelia_data.RData")
 
 predict.time <- function(raceID, train.data, test.data, test.predict)
 {
-  browser()
+  # browser()
   # Isolate a race to predict among those than need prediction
   dataline = test.predict[which(test.predict$raceID == raceID),]
   ID = dataline$id # Identifies the racer
@@ -144,11 +140,12 @@ predict.time <- function(raceID, train.data, test.data, test.predict)
   # Imputation for missing variables
   # This uses all.data to estimate the missing variables in dataline:
   # moving_time, avg_speed, max_speed, avg_hr, avg_hr
-  # combined <- rbind(all.data, dataline)  
+  # combined <- rbind(all.data, dataline)
+  
   
   
   # Run the GAM for that race and get an estimated time in response
-  est.time <- gam.combo(all.data, dataline) 
+  est.time <- gam.combo.hr(all.data, dataline) 
   
   # Determine the INTERVAL it will fall into
   # This is ABSOLUTELY not the final interval to use!
@@ -156,9 +153,69 @@ predict.time <- function(raceID, train.data, test.data, test.predict)
   pred.hi = est.time*1.05
   
   out = data.frame(est.time, pred.lo, pred.hi)
+  out
 }
 
-test = predict.time(5193, dat.run.train, dat.run.test, dat.run.to.predict)
+predict.time.new <- function(raceID, train.data, test.data, test.predict)
+{
+  # Isolate a race to predict among those than need prediction
+  dataline = test.predict[which(test.predict$raceID == raceID),]
+  ID = dataline$id # Identifies the racer
+  racer.data = test.data[which(test.data$id == ID),] # All data for the racer in question
+  
+  race.date <- as.Date(dataline$start_date_local) # Date of race  
+  
+  # Reduce racer data to only entries BEFORE this race time,
+  # as well only variables that matter for our model
+  racer.data <- racer.data[which(as.Date(racer.data$start_date_local) < race.date),]
+  racer.data <- racer.data[,1:9]
+  dataline <- dataline[,1:9]
+  names(racer.data) <- names(train.data) # Make the names match properly for the 2 dataframes
+  names(dataline) <- names(train.data)
+  racer.data$start_date_local <- NULL
+  dataline$start_date_local <- NULL
+
+  # train.data is what we use to predict times
+  # racer.data is what we use to IMPUTE missing values in dataline
+  
+  # Imputation for missing variables
+  # This uses all.data to estimate the missing variables in dataline:
+  # moving_time, avg_speed, max_speed, avg_hr, avg_hr
+
+  #browser()
+  
+  combined <- rbind(as.matrix(dataline), as.matrix(racer.data))
+  
+  if(nrow(combined) >= 3)
+  {
+    imputed <- impute.NN_HD(data = combined)
+    new.dataline <- imputed[1,]
+  }
+  else # Just take the first entry as an estimate
+  {
+    combined[1,c(2,3,5,6,7,8)] <- combined[2,c(2,3,5,6,7,8)]
+    new.dataline <- combined[1,]
+  }
+  
+  # Truncate to remove elapsed_time (since we want to predict it)
+  new.dataline <- new.dataline[c(1:2,4:8)]
+  
+  # Run the GAM for that race and get an estimated time in response
+  est.time <- gam.combo.hr(train.data, new.dataline) 
+  
+  # Determine the INTERVAL it will fall into
+  # This is ABSOLUTELY not the final interval to use!
+  pred.lo = est.time*0.95
+  pred.hi = est.time*1.05
+  
+  out = data.frame(est.time, pred.lo, pred.hi)
+  print("Iteration done!")
+  out
+}
+
+
+
+test = predict.time.new(33, dat.run.train, dat.run.test, dat.run.to.predict)
 
 
 test = gam.combo.hr(dat.run.train,dat.run.train[2,])
@@ -168,19 +225,29 @@ test = unlist(test)
 dat.run.train$elapsed_time[1:10]
 
 
-dat.run.train[1,]
-
 # Run predict.time over all races to predict to get a result
 raceID.predict <- dat.run.to.predict$raceID
-predictions <- sapply(raceID.predict,
-                      function(x) predict.time(x, dat.run.train, dat.run.test,
+# NOTE: raceID == 33 causes HotDeck to Fail!
+start = proc.time()
+predictions <- sapply(raceID.predict[1:nrow(dat.run.to.predict)],
+                      function(x) predict.time.new(x, dat.run.train, dat.run.test,
                                                dat.run.to.predict))
-
+time = proc.time() - start
 # Finally, determine which races to opt out of based on accuracy problems, etc.
-opt_out = rep(0,nrow(dat.run.to.prediction))
+opt_out = rep(0,nrow(dat.run.to.predict))
 
+athleteID = numeric(length(raceID.predict))
+for(i in 1:length(raceID.predict))
+{
+  athleteID[i] = dat.run.to.predict[which(dat.run.to.predict$raceID == raceID.predict[i]),11]
+}
 
 # The final resulting CSV takes this form
-final.df = data.frame(dat.run.to.predict$id, dat.run.to.predict$raceID,
+final.df = data.frame(athleteID, raceID.predict,
                       predictions$est.time, predictions$pred.lo,
                       predictions$pred.hi, opt_out)
+
+names(final.df) = c("athleteID", "raceID", "elapsed_time",
+                    "pred_lo", "pred_hi", "opt_out")
+
+write.csv(final.df,"gam_model_submission.csv") #write out processed data

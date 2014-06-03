@@ -35,7 +35,7 @@ filenames = list.files()
 # TAKES ABOUT 16-17 min. for each 100
 
 
-dats <- lapply(1001:1001, function(i)
+dats <- lapply(1:1001, function(i)
   fromJSON(txt = filenames[i]))
 
 
