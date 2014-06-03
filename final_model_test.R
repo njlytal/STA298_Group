@@ -28,8 +28,8 @@ dat.run.train.imp3 = am.test2$imputations[[3]][,c(13,12,11,14,8,34,15,16,17)]
 dat.run.train.imp4 = am.test2$imputations[[4]][,c(13,12,11,14,8,34,15,16,17)]
 dat.run.train.imp5 = am.test2$imputations[[5]][,c(13,12,11,14,8,34,15,16,17)]
 
-train.avg.hr = numeric(nrow(dat.run.train.imp1))
-train.max.hr = numeric(nrow(dat.run.train.imp1))
+avg_hr = numeric(nrow(dat.run.train.imp1))
+max_hr = numeric(nrow(dat.run.train.imp1))
 
 for(i in 1:nrow(dat.run.train.imp1))
 {
@@ -41,7 +41,6 @@ for(i in 1:nrow(dat.run.train.imp1))
                          dat.run.train.imp5[i,9]))
 }
 
-max_hr = train.max.hr
 dat.run.train = am.test2$imputations[[1]][,c(13,12,11,14,8,34,15)]
 dat.run.train = cbind(dat.run.train, avg_hr, max_hr)
 rm(dat.run.train.imp1, dat.run.train.imp2, dat.run.train.imp3,
@@ -54,6 +53,48 @@ rm(avg_hr, max_hr)
 # distance, moving_time, elapsed_time, elev_gain, start_date_local, avg_speed, max_speed,
 # avg_hr, max_hr
 
+# REPEAT for the TEST data
+load("~/Desktop/STA 298 findings/test_data_imputed.RData")
+imp1 = am.test2$imputations[[1]]
+imp2 = am.test2$imputations[[2]]
+imp3 = am.test2$imputations[[3]]
+imp4 = am.test2$imputations[[4]]
+imp5 = am.test2$imputations[[5]]
+
+# Average the imputations for avg_hr and max_hr
+avg_hr = numeric(nrow(imp1))
+max_hr = numeric(nrow(imp1))
+
+for(i in 1:nrow(imp1))
+{
+  avg_hr[i] = mean(c(imp1[i,8], imp2[i,8],
+                     imp3[i,8], imp4[i,8], imp5[i,8]))
+  max_hr[i] = mean(c(imp1[i,9], imp2[i,9],
+                     imp3[i,9], imp4[i,9], imp5[i,9]))
+}
+
+avg.hr.combo = cbind(imp1[,8],imp2[,8], imp3[,8], imp4[,8], imp5[,8])
+avg_hr = sapply(1:nrow(imp1), function(x) mean(avg.hr.combo[x,]))
+
+max.hr.combo = cbind(imp1[,9],imp2[,9], imp3[,9], imp4[,9], imp5[,9])
+max_hr = sapply(1:nrow(imp1), function(x) mean(max.hr.combo[x,]))
+
+
+dat.run.test = am.test2$imputations[[1]]
+dat.run.test$average_heartrate <- avg_hr
+dat.run.test$max_heartrate <- max_hr
+rm(avg.hr.combo, avg_hr, max.hr.combo, max_hr)
+rm(imp1, imp2, imp3, imp4, imp5)
+
+# Now dat.run.test has all the test data with imputed values
+# Reduces test the following variables:
+# distance, moving_time, elapsed_time, total_elevation_gain, start_date_local,
+# average_speed, max_speed,
+# average_heartrate, max_heartrate, raceID, id, eventID
+
+# AT THIS POINT, CAN LOAD
+load("~/Desktop/STA 298 findings/all_train_test_amelia_data.RData")
+# TO GET ALL UPDATED DATA!
 
 # Create a function that does the following:
 
@@ -120,7 +161,14 @@ predict.time <- function(raceID, train.data, test.data, test.predict)
 test = predict.time(5193, dat.run.train, dat.run.test, dat.run.to.predict)
 
 
-test = gam.combo.hr(dat.run.train,dat.run.train[1,])
+test = gam.combo.hr(dat.run.train,dat.run.train[2,])
+
+test = lapply(1:10, function(x) gam.combo.hr(dat.run.train,dat.run.train[x,]))
+test = unlist(test)
+dat.run.train$elapsed_time[1:10]
+
+
+dat.run.train[1,]
 
 # Run predict.time over all races to predict to get a result
 raceID.predict <- dat.run.to.predict$raceID
