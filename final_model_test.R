@@ -289,3 +289,9 @@ names(final.df) = c("athleteID", "raceID", "elapsed_time",
 
 write.csv(final.df,"gam_sub.csv", row.names = FALSE) #write out processed data
 
+
+# Extra Material
+gam.model = gam(dat.run.train$elapsed_time ~ dat.run.train$distance + dat.run.train$moving_time +
+                  dat.run.train$elev_gain + dat.run.train$avg_speed + dat.run.train$max_speed + 
+                  dat.run.train$avg_hr + dat.run.train$max_hr)
+
