@@ -102,7 +102,7 @@ load("~/Desktop/STA 298 findings/all_train_test_amelia_data.RData")
 # training data has   yyyy-mm-dd 00:00:00"
 # test data has       yyyy-mm-ddT00:00:00Z"
 # But as.Date() yields the same result, so no changes are needed to format
-# before converting to a Date object
+# before converting to a Date object (actually, this occurs earlier as well)
 
 # 3. Use all the given data to run on our
 # id: which racer is it
