@@ -125,46 +125,10 @@ load("~/Desktop/STA 298 findings/all_train_test_FINAL_data.RData")
 # train.data: The entire dataframe of training data
 # test.data: The entire dataframe of test data
 # test.predict: The dataframe ONLY of races with times missing (to predict)
+# failsafe: set of imputable values if no previous racer data exists
+# RMSE: The calculated RMSE of the gam being used (for prediction intervals)
 
-predict.time <- function(raceID, train.data, test.data, test.predict)
-{
-  # browser()
-  # Isolate a race to predict among those than need prediction
-  dataline = test.predict[which(test.predict$raceID == raceID),]
-  ID = dataline$id # Identifies the racer
-  racer.data = test.data[which(test.data$id == ID),] # All data for the racer in question
-  
-  race.date <- as.Date(dataline$start_date_local) # Date of race  
-  
-  # Reduce racer data to only entries BEFORE this race time,
-  # as well only variables that matter for our model
-  racer.data <- racer.data[which(as.Date(racer.data$start_date_local) < race.date),]
-  racer.data <- racer.data[,c(1,2,3,4,5,6,7,8,9)]
-  dataline <- dataline[,c(1,2,3,4,5,6,7,8,9)]
-  names(racer.data) <- names(train.data) # Make the names match properly for the 2 dataframes
-  names(dataline) <- names(train.data)
-  all.data <- rbind(train.data, racer.data) # Combine all relevant data
-  
-  # Imputation for missing variables
-  # This uses all.data to estimate the missing variables in dataline:
-  # moving_time, avg_speed, max_speed, avg_hr, avg_hr
-  # combined <- rbind(all.data, dataline)
-  
-  
-  
-  # Run the GAM for that race and get an estimated time in response
-  est.time <- gam.combo.hr(all.data, dataline) 
-  
-  # Determine the INTERVAL it will fall into
-  # This is ABSOLUTELY not the final interval to use!
-  pred.lo = est.time*0.95
-  pred.hi = est.time*1.05
-  
-  out = data.frame(est.time, pred.lo, pred.hi)
-  out
-}
-
-predict.time.new <- function(raceID, train.data, test.data, test.predict, failsafe)
+predict.time.new <- function(raceID, train.data, test.data, test.predict, failsafe, RMSE)
 {
   # Isolate a race to predict among those than need prediction
   dataline = test.predict[which(test.predict$raceID == raceID),]
@@ -219,19 +183,92 @@ predict.time.new <- function(raceID, train.data, test.data, test.predict, failsa
   # Determine the INTERVAL it will fall into
   # This is a very lax and unspecific interval, but it's
   # doing the job for now
-  pred.lo = est.time*0.95
-  pred.hi = est.time*1.05
+  pred.lo = est.time - 0.5*RMSE
+  pred.hi = est.time + 0.5*RMSE
   
   out = data.frame(est.time, pred.lo, pred.hi)
   print("Iteration done!")
   out
 }
 
+predict.time.newer <- function(raceID, train.data, test.data, test.predict, failsafe, gam.object, RMSE)
+{
+  # browser()
+  
+  # Isolate a race to predict among those than need prediction
+  dataline = test.predict[which(test.predict$raceID == raceID),]
+  ID = dataline$id # Identifies the racer
+  racer.data = test.data[which(test.data$id == ID),] # All data for the racer in question
+  
+  race.date <- as.Date(dataline$start_date_local) # Date of race  
+  
+  # Reduce racer data to only entries BEFORE this race time,
+  # as well only variables that matter for our model
+  racer.data <- racer.data[which(as.Date(racer.data$start_date_local) < race.date),]
+  racer.data <- racer.data[,1:9]
+  dataline <- dataline[,1:9]
+  names(racer.data) <- names(train.data) # Make the names match properly for the 2 dataframes
+  names(dataline) <- names(train.data)
+  racer.data$start_date_local <- NULL
+  dataline$start_date_local <- NULL
+  
+  var.names <- names(dataline)
+  # train.data is what we use to predict times
+  # racer.data is what we use to IMPUTE missing values in dataline
+  
+  # Imputation for missing variables
+  # This uses all.data to estimate the missing variables in dataline:
+  # moving_time, avg_speed, max_speed, avg_hr, avg_hr
+  
+  #browser()
+  
+  combined <- rbind(as.matrix(dataline), as.matrix(racer.data))
+  
+  if(nrow(combined) == 1)
+  {
+    combined[1,c(2,3,5,6,7,8)] <- failsafe[c(2,3,5,6,7,8)]
+    new.dataline <- combined[1,]
+  }
+  if(nrow(combined) == 2)
+  {
+    combined[1,c(2,3,5,6,7,8)] <- combined[2,c(2,3,5,6,7,8)]
+    new.dataline <- combined[1,]
+  }
+  if(nrow(combined) >= 3)
+  {
+    imputed <- impute.NN_HD(data = combined)
+    new.dataline <- imputed[1,]
+
+  }
+  # Restore variable names after imputation (which turned it into numeric class)
+  new.dataline <- as.data.frame(t(new.dataline))
+  names(new.dataline) <- var.names
+
+  #browser()
+  # Run the GAM for that race and get an estimated time in response
+  
+  est.time <- gam.predict(gam.object, new.dataline)
+  
+  # Determine the INTERVAL it will fall into
+  # This is a very lax and unspecific interval, but it's
+  # doing the job for now
+  pred.lo = est.time - RMSE
+  pred.hi = est.time + RMSE
+  
+  out = data.frame(est.time, pred.lo, pred.hi)
+  print("Iteration done!")
+  out
+}
+
+
+
+
+
 sapply(1:ncol(dat.run.train), function(x) summary(dat.run.train[,x]))
 
 train.avgs = sapply(c(1:4,6:9), function(x) mean(dat.run.train[,x]))
 
-test = predict.time.new(221, dat.run.train, dat.run.test, dat.run.to.predict, train.avgs)
+test.pred = predict.time.newer(10468, dat.run.train, dat.run.test, dat.run.to.predict, train.avgs, gam.train)
 
 
 test = gam.combo.hr(dat.run.train,dat.run.train[2,])
@@ -244,12 +281,12 @@ test = gam.combo.hr(dat.run.train,dat.run.train[2,])
 # Run predict.time over all races to predict to get a result
 raceID.predict <- dat.run.to.predict$raceID
 # NOTE: raceID == 33 causes HotDeck to Fail without the extra failsafe
-# built in!
-# NOTE: raceID == 221 has NO entries before the race...need a crap shoot.
+# due to lack of data to impute upon!
+# NOTE: raceID == 221 has NO entries before the race...need failsafe.
 start = proc.time()
 predictions <- sapply(raceID.predict[1:length(raceID.predict)],
-                      function(x) predict.time.new(x, dat.run.train, dat.run.test,
-                                               dat.run.to.predict, train.avgs))
+                      function(x) predict.time.newer(x, dat.run.train, dat.run.test,
+                                               dat.run.to.predict, train.avgs, gam.train))
 time = proc.time() - start
 
 # Put into a usable form
@@ -260,17 +297,25 @@ pred.est.time = unlist(predictions.df[,1])
 pred.lo = unlist(predictions.df[,2])
 pred.hi = unlist(predictions.df[,3])
 
+
 pred.df = as.data.frame(cbind(pred.est.time, pred.lo, pred.hi))
 
 # Finally, determine which races to opt out of based on accuracy problems, etc.
 opt_out = rep(0,nrow(dat.run.to.predict))
 
-# NOTES: 14 negative predictions. These are opted out, of course
+# NOTES: Some negative predictions exist. These are opted out, of course
+# Remove results and races to predict that don't make sense or are highly unlikely.
 opt_out[which(pred.est.time < 0)] <- 1
+opt_out[which(pred.est.time > 50000)] <- 1
+opt_out[which(dat.run.to.predict$distance > 50000 & pred.est.time < 5000)] <- 1
+opt_out[which(dat.run.to.predict$distance == 0)] <- 1
+opt_out[which(dat.run.to.predict$distance > 130000)] <- 1
 
-dat.run.to.predict[which(pred.est.time < 0),]
+#dat.run.to.predict[which(dat.run.to.predict$distance > 50000),]
 
-data.frame(dat.run.to.predict$distance, pred.est.time, pred.lo, pred.hi)
+#pred.est.time[which(dat.run.to.predict$distance > 50000)]
+
+#data.frame(dat.run.to.predict$distance, pred.est.time, pred.lo, pred.hi)
 
 
 athleteID = numeric(length(raceID.predict))
@@ -287,11 +332,20 @@ final.df = data.frame(athleteID, raceID.predict,
 names(final.df) = c("athleteID", "raceID", "elapsed_time",
                     "pred_lo", "pred_hi", "opt_out")
 
-write.csv(final.df,"gam_sub.csv", row.names = FALSE) #write out processed data
+write.csv(final.df,"gam_alt2.csv", row.names = FALSE) #write out processed data
+
 
 
 # Extra Material
+
+
+examine = data.frame(final.df[,3], dat.run.to.predict[,1])
+names(examine) = c("Pred. Time", "Distance")
+
+
 gam.model = gam(dat.run.train$elapsed_time ~ dat.run.train$distance + dat.run.train$moving_time +
                   dat.run.train$elev_gain + dat.run.train$avg_speed + dat.run.train$max_speed + 
                   dat.run.train$avg_hr + dat.run.train$max_hr)
+
+data.frame(predictions.df[,1], dat.run.to.predict[,1])
 

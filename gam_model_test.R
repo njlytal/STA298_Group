@@ -36,7 +36,7 @@ gam.combo = function(data)
   compare
 }
 
-test = gam.combo(dat.run.train)
+test = gam.combo.hr(dat.run.train)
 
 
 summary(dat.run.train[,10])
